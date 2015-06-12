@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />
+    <style type="text/css">
+        *{margin:0;padding:0;}
+        .clearfix:after{content:'.';display:block;height:0;clear:both;visibility:hidden;}
+        .clearfix {zoom: 1;}
+        .banWrap{position: relative;width:100%;overflow: hidden;}
+        .pic{list-style: none;-webkit-transform: translateX(0);}
+        .pic li{float:left;}
+       .pic  li img{display: block;width:100%;}
+        .tab{width:80px;position: absolute;left:calc(50% - (80px/2));bottom:10px;}
+        .tab li{display: inline-block;margin:2px;width:10px;height:10px;text-indent:-999em;border-radius: 100%;background:#fff;}
+        .tab .on{background:blueviolet;}
+    </style>
+</head>
+
+<body>
+<div class="banWrap clearfix">
+    <ul class="clearfix pic">
+        <li><img src="images/pat1_1.jpg"/></li>
+        <li><img src="images/pat1_2.jpg"/></li>
+        <li><img src="images/pat1_3.jpg"/></li>
+        <li><img src="images/pat1_4.jpg"/></li>
+    </ul>
+    <ul class="tab clearfix">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+    </ul>
+</div>
+<script type="text/javascript">
+    window.onload=function()
+    {
+        var banWrap=document.getElementsByClassName("banWrap")[0];
+        var oBox=banWrap.getElementsByClassName("pic")[0];
+        var oBoxLi=oBox.getElementsByTagName("li");
+        var tabBox=banWrap.getElementsByClassName("tab")[0];
+        var tabLi=tabBox.getElementsByTagName("li");
+        var touch="ontouchstart" in window;
+        var touchStart=touch?"touchstart":"mousedown";
+        var touchMove=touch?"touchmove":"mousemove";
+        var touchEnd=touch?"touchend":"mouseup";
+        for(var i=0;i<oBoxLi.length;i++)
+        {
+            oBoxLi[i].style.width=window.screen.availWidth+"px";
+        }
+        var w=parseInt(oBoxLi[0].offsetWidth);
+        oBox.style.width=w*6+"px";
+        var iScroll=0;//滚动距离
+        var iNow=0;//判断到了那一页面
+        var iStartX=0;//初始化
+        var iStartScroll=0;
+        var iStartPageX=0;
+        tabLi[0].className="on";
+        oBox.addEventListener(touchStart,start,false);
+        function start(ev)
+        {
+            var iDis=  ev.changedTouches ? ev.changedTouches[0] : ev ;
+            iStartPageX=iDis.pageX;//获取鼠标点击的时候的位置
+            iStartX=iScroll;
+            oBox.style.WebkitTransition=oBox.style.MozTransition=oBox.style.transition="none";
+            oBox.addEventListener(touchMove,move,false);
+            oBox.addEventListener(touchEnd,end,false);
+            return false;
+        }
+        function move(ev)
+        {
+            var en =  ev.changedTouches ? ev.changedTouches[0] : ev ;
+            var iDis=en.pageX-iStartPageX;
+            iScroll=iStartX+iDis;
+            doMove();
+            ev.preventDefault();
+        }
+        function end(ev)
+        {
+            oBox.removeEventListener(touchMove,move,false);
+            oBox.removeEventListener(touchEnd,end,false);
+            var en =  ev.changedTouches ? ev.changedTouches[0] : ev ;
+            var iDis=en.pageX-iStartPageX;
+            var iNub=Math.round(iDis/window.screen.width);
+            iNow-=iNub;
+            iNow=iNow%1<0.35?Math.floor(iNow):Math.ceil(iNow);
+
+            if(iNow<0)
+            {
+                iNow=0;
+                toggleClass()
+            }
+            else if(iNow>oBoxLi.length-1)
+            {
+                iNow=oBoxLi.length-1;
+                toggleClass()
+            }
+            iScroll=-iNow*window.screen.width;
+            oBox.style.WebkitTransition= oBox.style.MozTransition= oBox.style.transition=".5s";
+            doMove();
+
+        }
+        function toggleClass()
+        {
+            for(var i=0;i<tabLi.length;i++)
+            {
+
+                if(iNow==i)
+                {
+                    tabLi[i].className="on";
+                }
+                else
+                {
+                    tabLi[i].className="";
+                }
+            }
+        }
+        function doMove(){
+            oBox.style.WebkitTransform=  oBox.style.MozTransform=  oBox.style.transform="translateX("+iScroll+"px)";
+            toggleClass()
+        }
+
+    };
+
+</script>
+</body>
+</html>

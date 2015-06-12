@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body style="height:6000px;position: relative;">
+<a href="javascript:;" style="position: absolute;right:0;bottom:0;" id="btn">返回顶部</a>
+<script type="text/javascript">
+    function Xm()
+    {
+       this._this=this;
+    }
+    Xm.prototype.init=function()
+    {
+        console.log(_this);//Uncaught TypeError: undefined is not a function
+    };
+    var dd=new Xm();
+    Xm.init();
+
+</script>
+</body>
+</html>
+       

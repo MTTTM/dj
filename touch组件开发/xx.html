@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />
+    <style type="text/css">
+        *{margin:0;padding:0;}
+        .clearfix:after{content:'.';display:block;height:0;clear:both;visibility:hidden;}
+        .clearfix {zoom: 1;}
+        .banWrap{position: relative;width:100%;overflow: hidden;}
+        ul{list-style: none;-webkit-transform: translateX(0);}
+        li{float:left;}
+        li img{display: block;width:100%;}
+    </style>
+</head>
+
+<body>
+<div class="banWrap clearfix">
+    <ul class="clearfix" id="ul">
+        <li><img src="../images/pat1_1.jpg"/></li>
+        <li><img src="../images/pat1_2.jpg"/></li>
+        <li><img src="../images/pat1_3.jpg"/></li>
+        <li><img src="../images/pat1_4.jpg"/></li>
+    </ul>
+</div>
+<script type="text/javascript">
+    window.onload=function()
+    {
+        function extend(obj1,obj2)
+        {
+            for(var attr in obj2)
+            {
+                obj1[attr]=obj2[attr];
+            }
+        }
+        function XmTouch()
+        {
+            this.settings={
+                oUl:document.getElementById("ul"),
+                oLi:document.getElementById("ul").getElementsByTagName("li"),
+                btn:"false"
+            };
+        }
+        XmTouch.prototype.init=function(opt){
+            extend(this.settings,opt);
+            this.touchStar=null;
+            this.touchMove=null;
+            this.touchEnd=null;
+            this.iScroll=0;//滚动距离
+            this.iNow=0;//判断到了那一夜
+            this.iStartX=0;//初始化
+            this.iStartScroll=0;
+            this.iStartPageX=0;
+            this.oUl=this.settings.oUl;
+            this. oLi=this.settings.oLi;
+            this.events();
+            this.setLiWidth();
+            console.log("未点击的时候"+this +" typeof "+typeof  this);
+            this.oUl.addEventListener(this.touchStart,this.start,false);
+        };
+        XmTouch.prototype.events=function(){
+            var touch="ontouchstart" in window;
+            this.touchStart=touch?"touchstart":"mousedown";
+            this.touchMove=touch?"touchmove":"mousemove";
+            this.touchEnd=touch?"touchend":"mouseup";
+        };
+        XmTouch.prototype.setLiWidth=function()
+        {
+            for(var i=0;i<this.oLi.length;i++)
+            {
+                this.oLi[i].style.width=window.screen.availWidth+"px";
+            }
+            var w=parseInt(this.oLi[0].offsetWidth);
+            this.oUl.style.width=w*6+"px";
+        };
+       XmTouch.prototype.start=function(ev){
+
+           var iDis=  ev.changedTouches ? ev.changedTouches[0] : ev ;
+
+           play.call(XmTouch);
+           function play()
+           {
+               this.iStartPageX=iDis.pageX;//获取鼠标点击的时候的位置
+               this.iStartX=this.iScroll;
+               console.log("点击后的this"+this+" typeof "+typeof  this);
+            //   console.log(_this.oUl);//zheli的this指向oUl,但是我需要指向XmTouch
+               this.oUl.style.WebkitTransition=this.oUl.style.MozTransition=this.oUl.style.transition="none";//this找不到this.oUl
+               this.oUl.addEventListener(this.touchMove,this.move,false);
+               this.oUl.addEventListener(this.touchEnd,this.end,false);
+               return false;
+           }
+
+       };
+        XmTouch.prototype.move=function(ev){
+            var en =  ev.changedTouches ? ev.changedTouches[0] : ev ;
+            play.call(XmTouch);
+            function play()
+            {
+                var iDis=en.pageX-this.iStartPageX;
+                this.iScroll=this.iStartX+iDis;
+                this.doMove();
+            }
+
+            ev.preventDefault();
+        };
+        XmTouch.prototype.end=function(ev){
+            play.call(XmTouch);
+          function play()
+          {
+              this.oUl.removeEventListener(this.touchMove,this.move,false);
+              this.oUl.removeEventListener(this.touchEnd,this.end,false);
+              var en =  ev.changedTouches ? ev.changedTouches[0] : ev ;
+              var iDis=en.pageX-this.iStartPageX;
+              var iNub=Math.round(iDis/window.screen.width);
+              this.iNow-=iNub;
+              this.iNow=this.iNow%1<0.35?Math.floor(this.iNow):Math.ceil(this.iNow);
+              if(this.iNow<0)
+              {
+                  this.iNow=0;
+              }
+              else if(this.iNow>oLi.length-1)
+              {
+                  this.iNow=oLi.length-1;
+              }
+              this.iScroll=-this.iNow*window.screen.width;
+              this.oUl.style.WebkitTransition= this.oUl.style.MozTransition= this.oUl.style.transition=".5s";
+              this.doMove();
+          }
+        };
+        XmTouch.prototype.doMove=function()
+        {
+            this.oUl.style.WebkitTransform=  this.oUl.style.MozTransform=  this.oUl.style.transform="translateX("+this.iScroll+"px)";
+        };
+        var d1=new XmTouch();
+        d1.init();
+    };
+
+</script>
+</body>
+</html>
